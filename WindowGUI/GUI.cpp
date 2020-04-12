@@ -1,4 +1,8 @@
 #include <windows.h>
+#include <iostream>
+#include <stdlib.h>
+#include "DoubleIntegral.h"
+#include "Integral.h"
 using namespace std;
 
 #define HELP_MENU_DOUBLE 2
@@ -18,8 +22,12 @@ void displayDialogDou(HWND);
 
 
 HMENU hMenu;
-HWND hBG,hMainWindow,hBGA,hBGB;
+HWND hBG,hMainWindow,hBGA,hBGB,input1,input2,input3,input4,constant,power;
 HBITMAP hBGImage,hLogoI,hLogoII,hExit,hBGSin,hBGDou,hCal,hClose; 
+char n1[100],n2[100],n3[100],n4[100],rs[100],I1[100],I2[100],sumchar[100];
+float a,b,c,d;
+float f,g;
+float sum = 0;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args,int ncmdshow){
     WNDCLASSW wc = {0};
@@ -139,18 +147,55 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
     switch(msg)
     {
         case WM_COMMAND:
+        int val1,val2;
             switch (wp)
             {
             case 1:
                 EnableWindow(hMainWindow,true);
                 DestroyWindow(hwnd);
                 break;
+            case 2:
+                GetWindowText(input1,n1,100);
+                GetWindowText(input2,n2,100);
+                GetWindowText(input3,n3,100);
+                GetWindowText(input4,n4,100);
+                a = atof(n1); //up y
+                b = atof(n2); // low y
+                c = atof(n3); // up x
+                d = atof(n4); // low x
+                sum = Calculate(b,a,d,c);
+                sprintf(rs,"%f",sum);
+                MessageBeep(MB_ICONINFORMATION);
+                val1 = MessageBox(hwnd,rs,"Result",MB_OK);
+                break;
+            case 3:
+                GetWindowText(constant,I1,100);
+                GetWindowText(power,I2,100);
+                f = atof(I1); // constant
+                g = atof(I2); // power
+                if(g == 0)
+                {
+                    MessageBeep(MB_ICONINFORMATION);
+                    MessageBox(hwnd,"0","Result",MB_OK);
+                }
+                else if(f == 0)
+                {
+                    MessageBeep(MB_ICONINFORMATION);
+                    MessageBox(hwnd,"0","Result",MB_OK);
+                }
+                else{
+                    g = g+1;
+                    f = f/g;
+                    sprintf(sumchar,"%fx^%f",f,g);
+                    MessageBeep(MB_ICONINFORMATION);
+                    MessageBox(hwnd,sumchar,"Result",MB_OK);
+                }
+                
+                break;
             default:
                 break;
             }
         case WM_CLOSE:
-            EnableWindow(hMainWindow,true);
-            DestroyWindow(hwnd);
             break;
         default:
             return DefWindowProcW(hwnd,msg,wp,lp);
@@ -172,22 +217,28 @@ void registerDialogClass(HINSTANCE hInst)
 
 void displayDialogSin(HWND hwnd)
 {
-    HWND hDlgA = CreateWindowW(L"Dialog Calculate",L"Integral",WS_MINIMIZEBOX|WS_SYSMENU|WS_VISIBLE,700,100,500,500,hwnd,NULL,NULL,NULL);
+    HWND hDlgA = CreateWindowW(L"Dialog Calculate",L"Integral",WS_MINIMIZEBOX|WS_VISIBLE,700,100,500,500,hwnd,NULL,NULL,NULL);
     hBGA = CreateWindowW(L"Static",NULL,WS_VISIBLE|WS_CHILD|SS_BITMAP,0,0,0,0,hDlgA,NULL,NULL,NULL);
     SendMessageW(hBGA,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM) hBGSin);
-    HWND hButtonCalA = CreateWindowW(L"Button",L"Calculate",WS_VISIBLE|WS_CHILD|BS_BITMAP,20,20,100,40,hDlgA,NULL,NULL,NULL);
+    constant = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,130,190,60,50,hDlgA,NULL,NULL,NULL);
+    power = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,260,160,50,30,hDlgA,NULL,NULL,NULL);
+    HWND hButtonCalA = CreateWindowW(L"Button",L"Calculate",WS_VISIBLE|WS_CHILD|BS_BITMAP,350,380,100,40,hDlgA,(HMENU) 3,NULL,NULL);
     SendMessageW(hButtonCalA,BM_SETIMAGE,IMAGE_BITMAP,(LPARAM) hCal);
-    HWND hButtonCloseA = CreateWindowW(L"Button",L"Close",WS_VISIBLE|WS_CHILD|BS_BITMAP,20,70,100,40,hDlgA,(HMENU) 1,NULL,NULL);
+    HWND hButtonCloseA = CreateWindowW(L"Button",L"Close",WS_VISIBLE|WS_CHILD|BS_BITMAP,240,380,100,40,hDlgA,(HMENU) 1,NULL,NULL);
     SendMessageW(hButtonCloseA,BM_SETIMAGE,IMAGE_BITMAP,(LPARAM) hClose);
     EnableWindow(hwnd,false);
 }
 
 void displayDialogDou(HWND hwnd)
 {
-    HWND hDlgB = CreateWindowW(L"Dialog Calculate",L"Double Integral",WS_MINIMIZEBOX|WS_SYSMENU|WS_VISIBLE,700,100,500,500,hwnd,NULL,NULL,NULL);
+    HWND hDlgB = CreateWindowW(L"Dialog Calculate",L"Double Integral",WS_MINIMIZEBOX|WS_VISIBLE,700,100,500,500,hwnd,NULL,NULL,NULL);
     hBGB = CreateWindowW(L"Static",NULL,WS_VISIBLE|WS_CHILD|SS_BITMAP,0,0,0,0,hDlgB,NULL,NULL,NULL);
     SendMessageW(hBGB,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM) hBGDou);
-    HWND hButtonCalB = CreateWindowW(L"Button",L"Calculate",WS_VISIBLE|WS_CHILD|BS_BITMAP,350,380,100,40,hDlgB,NULL,NULL,NULL);
+    input1 = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,50,120,40,20,hDlgB,NULL,NULL,NULL); //up y
+    input2 = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,50,255,40,20,hDlgB,NULL,NULL,NULL); // low y
+    input3 = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,130,120,40,20,hDlgB,NULL,NULL,NULL); // up x
+    input4 = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,130,255,40,20,hDlgB,NULL,NULL,NULL); // low x
+    HWND hButtonCalB = CreateWindowW(L"Button",L"Calculate",WS_VISIBLE|WS_CHILD|BS_BITMAP,350,380,100,40,hDlgB,(HMENU) 2,NULL,NULL);
     SendMessageW(hButtonCalB,BM_SETIMAGE,IMAGE_BITMAP,(LPARAM) hCal);
     HWND hButtonCloseB =CreateWindowW(L"Button",L"Close",WS_VISIBLE|WS_CHILD|BS_BITMAP,240,380,100,40,hDlgB,(HMENU) 1,NULL,NULL);
     SendMessageW(hButtonCloseB,BM_SETIMAGE,IMAGE_BITMAP,(LPARAM) hClose);
