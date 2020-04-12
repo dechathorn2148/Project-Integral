@@ -22,10 +22,10 @@ void displayDialogDou(HWND);
 
 
 HMENU hMenu;
-HWND hBG,hMainWindow,hBGA,hBGB,input1,input2,input3,input4,constant,power;
+HWND hBG,hMainWindow,hBGA,hBGB,input1,input2,input3,input4,stepx,stepy,constant,power;
 HBITMAP hBGImage,hLogoI,hLogoII,hExit,hBGSin,hBGDou,hCal,hClose; 
-char n1[100],n2[100],n3[100],n4[100],rs[100],I1[100],I2[100],sumchar[100];
-float a,b,c,d;
+char n1[100],n2[100],n3[100],n4[100],rs[100],I1[100],I2[100],sumchar[100],h[100],k[100];
+float a,b,c,d,j,l;
 float f,g;
 float sum = 0;
 
@@ -65,11 +65,11 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             {
                 case HELP_MENU_DOUBLE:
                 MessageBeep(MB_ICONINFORMATION);
-                MessageBox(hwnd,"You Baka!!","Double Integral",MB_OK);
+                MessageBox(hwnd,"Calculate for find Area by Double Integral.Only input by number value.","Double Integral",MB_OK);
                 break;
                 case HELP_MENU_INTEGRAL:
                 MessageBeep(MB_ICONINFORMATION);
-                MessageBox(hwnd,"You Baka!!","Integral",MB_OK);
+                MessageBox(hwnd,"Normal Integral","Integral",MB_OK);
                 break;
                 case MENU_Exit:
                 val = MessageBoxW(hwnd,L"Are you sure?",L"Message",MB_YESNO | MB_ICONWARNING);
@@ -77,7 +77,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
                     DestroyWindow(hwnd);
                 }
                 else if(val==IDNO){
-
+                    break;
                 }
                 case MENU_INTEGRAL:
                     displayDialogSin(hwnd);
@@ -108,7 +108,7 @@ void AddMenus(HWND hwnd)
     HMENU hHelpMenu = CreateMenu();
     AppendMenu(hHelpMenu,MF_STRING,HELP_MENU_INTEGRAL,"Integral");
     AppendMenu(hHelpMenu,MF_SEPARATOR,NULL,NULL);
-    AppendMenu(hHelpMenu,MF_STRING,HELP_MENU_DOUBLE,"Space by Double Integral");
+    AppendMenu(hHelpMenu,MF_STRING,HELP_MENU_DOUBLE,"Double Integral");
     
     AppendMenu(hMenu,MF_POPUP,(UINT_PTR)hHelpMenu,"Help");
 
@@ -159,11 +159,15 @@ LRESULT CALLBACK DialogProcedure(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
                 GetWindowText(input2,n2,100);
                 GetWindowText(input3,n3,100);
                 GetWindowText(input4,n4,100);
+                GetWindowText(stepx,h,100);
+                GetWindowText(stepy,k,100);
                 a = atof(n1); //up y
                 b = atof(n2); // low y
                 c = atof(n3); // up x
                 d = atof(n4); // low x
-                sum = Calculate(b,a,d,c);
+                j = atof(h); //h
+                l = atof(k); //k
+                sum = Calculate(b,a,d,c,j,l);
                 sprintf(rs,"%f",sum);
                 MessageBeep(MB_ICONINFORMATION);
                 val1 = MessageBox(hwnd,rs,"Result",MB_OK);
@@ -238,6 +242,8 @@ void displayDialogDou(HWND hwnd)
     input2 = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,50,255,40,20,hDlgB,NULL,NULL,NULL); // low y
     input3 = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,130,120,40,20,hDlgB,NULL,NULL,NULL); // up x
     input4 = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,130,255,40,20,hDlgB,NULL,NULL,NULL); // low x
+    stepx = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,390,18,40,20,hDlgB,NULL,NULL,NULL); //h
+    stepy = CreateWindowW(L"Edit",L"",WS_VISIBLE|WS_CHILD,390,48,40,20,hDlgB,NULL,NULL,NULL); //k
     HWND hButtonCalB = CreateWindowW(L"Button",L"Calculate",WS_VISIBLE|WS_CHILD|BS_BITMAP,350,380,100,40,hDlgB,(HMENU) 2,NULL,NULL);
     SendMessageW(hButtonCalB,BM_SETIMAGE,IMAGE_BITMAP,(LPARAM) hCal);
     HWND hButtonCloseB =CreateWindowW(L"Button",L"Close",WS_VISIBLE|WS_CHILD|BS_BITMAP,240,380,100,40,hDlgB,(HMENU) 1,NULL,NULL);
