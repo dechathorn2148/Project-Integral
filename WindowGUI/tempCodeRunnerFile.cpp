@@ -1,1 +1,1 @@
-dialog.hCursor = LoadCursor(NULL,IDC_ARROW);
+19
